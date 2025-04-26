@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\WordController;
+use App\Http\Controllers\QuizResultController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +21,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 
-// Get the authenticated user
+
 Route::middleware('auth:sanctum')->group(function () {
     // Get the authenticated user
     Route::get('/user', [AuthController::class, 'user']);
@@ -28,5 +29,17 @@ Route::middleware('auth:sanctum')->group(function () {
     // Logout (revoke current token)
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    // Word routes
     Route::get('/words/{unit}', [WordController::class, 'index']);
+    // Create a new word (POST /api/words)
+    Route::post('/words', [WordController::class, 'store']);
+    // Update an existing word (PUT /api/words/{word})
+    Route::put('/words/{word}', [WordController::class, 'update']);
+    // Delete a word (DELETE /api/words/{word})
+    Route::delete('/words/{word}', [WordController::class, 'destroy']);
+
+
+    // Quiz results routes
+    Route::get('/quiz-results', [QuizResultController::class, 'index']);
+    Route::post('/quiz-results', [QuizResultController::class, 'store']);
 });
