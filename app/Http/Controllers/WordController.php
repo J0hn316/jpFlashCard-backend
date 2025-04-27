@@ -7,14 +7,34 @@ use Illuminate\Http\Request;
 
 class WordController extends Controller
 {
-    // GET  /api/words/{unit}
-    public function index($unit)
+    /**
+     * List words by unit with optional pagination and search.
+     *
+     * GET /api/words/{unit}?per_page=15&search=...
+     */
+    public function index(Request $request, $unit)
     {
-        $words = Word::where('unit', $unit)->get();
-        return response()->json($words);
+        // Number of items per page (default is 15)
+        $perPage = $request->integer('per_page', 15);
+
+        // Optional search term
+        $search = $request->string('search');
+
+        $query = Word::where('unit', $unit)->when($search, function ($q, $s) {
+            $q->where('english', 'like', "%{$s}%")->orWhere('japanese', 'like', value: "%{$s}%");
+        });
+
+        // Paginate results and preserve query parameters.
+        $paginated = $query->paginate($perPage)->appends($request->only(["per_page", "search"]));
+
+        return response()->json($paginated);
     }
 
-    // POST /api/words
+    /**
+     * Create a new word.
+     *
+     * POST /api/words
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -29,7 +49,11 @@ class WordController extends Controller
         return response()->json($word, 201);
     }
 
-    // Put /api/words/{word}
+    /**
+     * Update an existing word.
+     *
+     * PUT /api/words/{word}
+     */
     public function update(Request $request, Word $word)
     {
         $data = $request->validate([
@@ -44,7 +68,11 @@ class WordController extends Controller
         return response()->json($word);
     }
 
-    // Delete /api/words/{words}
+    /**
+     * Delete a word.
+     *
+     * DELETE /api/words/{word}
+     */
     public function destroy(Word $word)
     {
         $word->delete();
