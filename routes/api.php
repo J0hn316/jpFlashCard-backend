@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\WordController;
 use App\Http\Controllers\QuizResultController;
+use App\Models\Word;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +22,13 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 
+Route::get('/units', function () {
+    return Word::query()
+        ->select('unit')
+        ->distinct()
+        ->orderBy('unit')
+        ->pluck('unit');
+});
 
 Route::middleware('auth:sanctum')->group(function () {
     // Get the authenticated user
