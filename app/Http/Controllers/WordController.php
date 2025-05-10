@@ -8,27 +8,51 @@ use Illuminate\Http\Request;
 class WordController extends Controller
 {
     /**
+     * List all words.
+     * GET /api/words
+     */
+    public function all(Request $request)
+    {
+        $perPage = $request->integer("per_page", 15);
+        $search = trim($request->string("search"));
+
+        $query = Word::query()->when($search !== '', fn($q) => $q->where('english', 'like', "{$search}%"));
+
+        return $query->paginate($perPage)->appends($request->only(["per_page", "search"]));
+    }
+
+    /**
      * List words by unit with optional pagination and search.
      *
      * GET /api/words/{unit}?per_page=15&search=...
      */
     public function index(Request $request, $unit)
     {
-        // Number of items per page (default is 15)
+        // 1) grab pagination & raw search term
         $perPage = $request->integer('per_page', 15);
+        $search = trim($request->input('search', ''));
 
-        // Optional search term
-        $search = $request->string('search');
+        // 2) build the base query (filter by unit)
+        $query = Word::where('unit', $unit);
 
-        $query = Word::where('unit', $unit)->when($search, function ($q, $s) {
-            $q->where('english', 'like', "%{$s}%")->orWhere('japanese', 'like', value: "%{$s}%");
-        });
+        // 3) if search isn’t empty, do a starts-with match on English
+        if ($search !== '') {
 
+            // $query->where('english', 'like', "{$search}%");
+            // If you ever need to force a case-insensitive match
+            // regardless of your DB’s collation, you can do:
+            //
+            $query->whereRaw(
+                'LOWER(english) LIKE ?',
+                [strtolower($search) . '%']
+            );
+        }
         // Paginate results and preserve query parameters.
         $paginated = $query->paginate($perPage)->appends($request->only(["per_page", "search"]));
 
         return response()->json($paginated);
     }
+
 
     /**
      * Create a new word.

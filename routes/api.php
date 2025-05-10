@@ -38,6 +38,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Word routes
+    Route::get('/words', [WordController::class, 'all']);
+
     Route::get('/words/{unit}', [WordController::class, 'index']);
     // Create a new word (POST /api/words)
     Route::post('/words', [WordController::class, 'store']);
