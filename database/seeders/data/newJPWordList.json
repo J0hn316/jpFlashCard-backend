@@ -571,12 +571,12 @@
     },
     {
         "English": "boy",
-        "Unit": "Age",
+        "Unit": "Gender",
         "JP": { "Japanese": "男の子", "Romaji": "otokonoko" }
     },
     {
         "English": "girl",
-        "Unit": "Age",
+        "Unit": "Gender",
         "JP": { "Japanese": "女の子", "Romaji": "onnanoko" }
     },
     {

@@ -51,5 +51,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Quiz results routes
     Route::get('/quiz-results', [QuizResultController::class, 'index']);
+    Route::get('/quiz-results/summary', [QuizResultController::class, 'summary']);
     Route::post('/quiz-results', [QuizResultController::class, 'store']);
 });
